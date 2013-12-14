@@ -1,6 +1,6 @@
 
 
-var screen, sound, keyboard, mouse, image, tilesheet;
+var screen, sound, keyboard, mouse, image, tilesheet, map, offset={x:0,y:0}, player;
 window.addEventListener('load', function() {
 
     // Create instances
@@ -10,6 +10,8 @@ window.addEventListener('load', function() {
     mouse     = new NT_MouseHandler('view');
     image     = new NT_ImageHandler();
     tilesheet = new NT_TilesheetHandler();
+    map       = new NT_MapHandler();
+    player    = new NT_PlayerObject();
 
     // Debugger
     screen.setDebug(true);
@@ -18,17 +20,41 @@ window.addEventListener('load', function() {
     sound.setDebug(true);
     image.setDebug(true);
     tilesheet.setDebug(true);
+    map.setDebug(true);
+
+    map.loadMap('map1', 'asset/map/map2.json');
 
     screen.disableSmoothing();
 
     // Render Screen
     screen.render();
 
-    image.loadImage('testSheetImage', 'asset/img/testsheet.png', function() {
-        tilesheet.newSheet('testSheet', image.getImage('testSheetImage'), 16, 16, function() {
-            tilesheet.renderTile('testSheet', 0, 10, 10, 5, screen.getContext());
-            tilesheet.renderTile('testSheet', 1, 106, 10, 5, screen.getContext());
+    image.loadImage('terrain', 'asset/img/terrain.png', function() {
+        tilesheet.newSheet('terrain', image.getImage('terrain'), 16, 16, function() {
+            setInterval(function() { tickLoop() }, (1000/30));
+            setInterval(function() { renderLoop() }, 0);
         });
     });
 
 });
+
+function renderLoop() {
+    screen.render();
+    screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y);
+    screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y);
+}
+
+function tickLoop() {
+    if (keyboard.keyPressed(65)) {
+        offset.x += 4;
+    }
+    if (keyboard.keyPressed(68)) {
+        offset.x -= 4;
+    }
+    if (keyboard.keyPressed(87)) {
+        offset.y += 4;
+    }
+    if (keyboard.keyPressed(83)) {
+        offset.y -= 4;
+    }
+}

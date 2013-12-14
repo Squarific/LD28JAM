@@ -1,4 +1,40 @@
 
+
+
+
+function NT_Ajax() {
+    this.debug = false;
+}
+NT_Ajax.prototype.loadFileGET = function(url, callback) {
+    var xmlhttp = window.XMLHttpRequest? new XMLHttpRequest(): xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    var t = this;
+    xmlhttp.addEventListener('readystatechange', function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            if (t.debug) { console.log('[NTAjax] Got file "' + url + '" using GET') }
+            if (callback) { callback(xmlhttp.responseText); }
+        }
+    });
+    xmlhttp.open('GET', url, true);
+    xmlhttp.send();
+};
+NT_Ajax.prototype.loadFilePOST = function(url, params, callback) {
+    var xmlhttp = window.XMLHttpRequest? new XMLHttpRequest(): xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    var t = this;
+    xmlhttp.addEventListener('readystatechange', function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            if (t.debug) { console.log('[NTAjax] Got file "' + url + '" using POST') }
+            if (callback) { callback(xmlhttp.responseText); }
+        }
+    });
+    xmlhttp.open('POST', url, true);
+    xmlhttp.setRequestHeader('Conent-type', 'application/x-www-form-urlencoded');
+    xmlhttp.send(params);
+};
+NT_Ajax.prototype.setDebug = function(b, callback) {
+    this.debug = b;
+    if (callback) { callback(); }
+}
+
 /* ---- SCREEN ---- */
 function NT_Screen(canvasid, width, height, background, foreground) {
     this.debug = false;
@@ -41,6 +77,31 @@ NT_Screen.prototype.enableSmoothing = function() {
         this.context.imageSmoothingEnabled = true;
         this.context.webkitImageSmoothingEnabled = true;
         this.context.mozImageSmoothingEnabled = true;
+    }
+};
+NT_Screen.prototype.renderMap = function(ntmap, layer, tilemanager, tilesheet, scale, offsetx, offsety) {
+    var width = ntmap.layers[layer].width;
+    var data = ntmap.layers[layer].data;
+
+    var tilesize = tilemanager.getTileSize(tilesheet);
+    var tilewidth = tilesize.width;
+    var tileheight = tilesize.height;
+
+    var x = 0;
+    var y = 0;
+    for (var i=0; i<data.length; i++) {
+        var rx = (x*(tilewidth*scale))+offsetx;
+        var ry = (y*(tileheight*scale))+offsety;
+
+        if ((rx > 0-(tilewidth*scale) && rx <= 640+(tilewidth*scale)) && (ry > 0-(tileheight*scale) && ry <= 480+(tileheight*scale))) {
+            tilemanager.renderTile(tilesheet, data[i]-1, rx, ry, scale, this.getContext());
+        }
+
+        x++;
+        if (x == width) {
+            x=0;
+            y++;
+        }
     }
 };
 NT_Screen.prototype.setDebug = function(b, callback) {
@@ -193,6 +254,9 @@ NT_TilesheetHandler.prototype.renderTile = function(name, id, x, y, scale, conte
     if (callback) { callback(); }
 
 };
+NT_TilesheetHandler.prototype.getTileSize = function(name) {
+    return this.tilesheets[name].tilesize;
+};
 NT_TilesheetHandler.prototype.tilePosition = function(id, tilew, tileh, imagew, callback) {
 
     var tw = Math.floor( imagew / tilew );
@@ -268,10 +332,38 @@ function NT_MapHandler() {
     this.debug = false;
     this.maps = {};
 }
-NT_MapHandler.prototype.loadMap = function(name, mapObject) {
-    this.maps[name] = mapObject;
+NT_MapHandler.prototype.loadMap = function(name, file, callback) {
+    var nta = new NT_Ajax();
+    var t = this;
+    nta.loadFileGET(file, function(data) {
+        t.maps[name] = JSON.parse(data);
+        if (t.debug) { console.log('[NTMap] Map "' + name + '" loaded'); }
+        if (callback) { callback(); }
+    });
+};
+NT_MapHandler.prototype.getMap = function(name) {
+    return this.maps[name];
 };
 NT_MapHandler.prototype.setDebug = function(b, callback) {
     this.debug = b;
     if (callback) { callback(); }
 };
+
+/* ---- PLAYER OBJECT ---- */
+function NT_PlayerObject() {
+    this.debug = false;
+}
+NT_PlayerObject.prototype.setDebug = function(b, callback) {
+    this.debug = b;
+    if (callback) { callback(); }
+};
+
+/* ---- LIBRARY OBJECT ---- */
+//function NT_Library() {
+//    this.library = {};
+//}
+//NT_Library.prototype.addSection = function(name, callback) {
+//    this.library[name] = {};
+//    if (callback) { callback(); }
+//}
+//NT_Library.prototype.set
