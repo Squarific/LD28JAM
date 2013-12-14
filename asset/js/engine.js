@@ -262,3 +262,16 @@ NT_SoundHandler.prototype.setDebug = function(b, callback) {
     this.debug = b;
     if (callback) { callback(); }
 };
+
+/* ---- MAP HANDLER ---- */
+function NT_MapHandler() {
+    this.debug = false;
+    this.maps = {};
+}
+NT_MapHandler.prototype.loadMap = function(name, mapObject) {
+    this.maps[name] = mapObject;
+};
+NT_MapHandler.prototype.setDebug = function(b, callback) {
+    this.debug = b;
+    if (callback) { callback(); }
+};
