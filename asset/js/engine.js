@@ -79,6 +79,12 @@ NT_Screen.prototype.enableSmoothing = function() {
         this.context.mozImageSmoothingEnabled = true;
     }
 };
+NT_Screen.prototype.renderPlayer = function (player, spritesheet, offsetx, offsety) {
+	var drawX = player.coords.x - offsetx,
+		drawY = player.coords.y - offsety;
+	player.updateSpriteY();
+	this.getContext().drawImage(spritesheet, player.sprite.x, player.sprite.y, player.width, player.height, drawX, drawY, player.width, player.height);
+};
 NT_Screen.prototype.renderMap = function(ntmap, layer, tilemanager, tilesheet, scale, offsetx, offsety) {
     var width = ntmap.layers[layer].width;
     var data = ntmap.layers[layer].data;
@@ -351,13 +357,68 @@ NT_MapHandler.prototype.setDebug = function(b, callback) {
 };
 
 /* ---- PLAYER OBJECT ---- */
-function NT_PlayerObject() {
+function NT_PlayerObject(width, height, spriteImage) {
     this.debug = false;
     this.coords = { x: 0, y: 0 };
+	this.frameRate = 30;
+	this.frameTime = 1000 / this.frameRate;
+	this.lastUpdate = Date.now();
+	this.width = width;
+	this.height = height;
+	this.movespeed = 5;
+	this.sprite = {x: 0, y: 0};
+	this.spriteYFrames = Math.floor(spriteImage.width / this.width);
+	this.spriteFrameSpeed = 1000 / this.spriteYFrames;
+	this.callbacks = {};
+	this.updateDirection({x: 0, y: 0});
 }
 NT_PlayerObject.prototype.setDebug = function(b, callback) {
     this.debug = b;
     if (callback) { callback(); }
+};
+NT_PlayerObject.prototype.updateDirection = function (direction) {
+	this.direction = direction;
+	var spriteNumber = (direction.x + 1) + (direction.y + 1) * 3;
+	/*
+		Row 0: Left, up
+		Row 1: Up
+		Row 2: Right, Up
+		Row 3: Left
+		Row 4: No movement
+		Row 5: Right
+		Row 6: Left, Down
+		Row 7: Down
+		Row 8: Right, Down
+	*/
+	this.sprite.x = this.height * spriteNumber;
+	this.spriteYStart = Date.now();
+	this.updateSpriteY();
+};
+NT_PlayerObject.prototype.updateSpriteY = function (time) {
+	var timeDiff = time - this.spriteYStart;
+	var framesPassed = Math.floor(timeDiff / this.spriteFrameSpeed);
+	this.sprite.y = this.width * (framesPassed % this.spriteYFrames);
+};
+NT_PlayerObject.prototype.addEventListener = function addEventListener (event, callback) {
+	if (typeof callback !== "function") {
+		console.log("Can't register event " + event + " because " + callback + " is not a function.");
+		return;
+	}
+	this.callbacks[event] = this.callbacks[event] || [];
+	this.callbacks[event].push(callback);
+};
+NT_PlayerObject.prototype.callEvent = function (event, arg) {
+	for (var k = 0; k < this.callbacks[event].length; k++) {
+		this.callbacks[event][k](arg);
+	}
+};
+NT_PlayerObject.prototype.tickTo = function (time) {
+	while (time - this.lastUpdate > this.frameTime) {
+		this.coords.x += this.direction.x * this.frameTime * this.movespeed;
+		this.coords.y += this.direction.y * this.frameTime * this.movespeed;
+		this.lastUpdate += this.frameTime;
+	}
+	this.callEvent("move", this);
 };
 
 /* ---- LIBRARY OBJECT ---- */

@@ -11,7 +11,7 @@ window.addEventListener('load', function() {
     image     = new NT_ImageHandler();
     tilesheet = new NT_TilesheetHandler();
     map       = new NT_MapHandler();
-    player    = new NT_PlayerObject();
+    player    = new NT_PlayerObject(PLAYERWIDTH, PLAYERHEIGHT, PLAYERSPRITEIMAGE);
 
     // Debugger
     screen.setDebug(true);
@@ -25,36 +25,54 @@ window.addEventListener('load', function() {
     map.loadMap('map1', 'asset/map/map3.json');
 
     screen.disableSmoothing();
+	
+	// Follow the player
+	player.addEventListener("move", function (player) {
+		offset.x = player.coords.x - screen.width / 2;
+		offset.y = player.coords.y - screen.height / 2;
+	});
 
     // Render Screen
     screen.render();
 
     image.loadImage('terrain', 'asset/img/terrain.png', function() {
         tilesheet.newSheet('terrain', image.getImage('terrain'), 16, 16, function() {
-            setInterval(function() { renderLoop() }, 0);
-            setInterval(function() { tickLoop() }, (1000/30));
+			requestAnimationFrame(loop);
         });
     });
 
 });
 
+function loop () {
+	tickLoop();
+	renderLoop();
+	requestAnimationFrame(renderLoop);
+}
+
 function renderLoop() {
     screen.render();
     screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y);
     screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y);
+	//screen.renderPlayer(player, PLAYERSPRITEIMAGE, offset.x, offset.y);
 }
 
 function tickLoop() {
+	var direction = {
+		x: 0,
+		y: 0
+	};
     if (keyboard.keyPressed(65)) {
-        offset.x += 4;
+        direction.x++;
     }
     if (keyboard.keyPressed(68)) {
-        offset.x -= 4;
+        direction.x--;
     }
     if (keyboard.keyPressed(87)) {
-        offset.y += 4;
+        direction.y++;
     }
     if (keyboard.keyPressed(83)) {
-        offset.y -= 4;
+        direction.y--;
     }
+	player.updateDirection(direction);
+	player.tickTo(Date.now());
 }
