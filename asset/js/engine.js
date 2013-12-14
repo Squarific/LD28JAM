@@ -93,7 +93,7 @@ NT_Screen.prototype.renderMap = function(ntmap, layer, tilemanager, tilesheet, s
         var rx = (x*(tilewidth*scale))+offsetx;
         var ry = (y*(tileheight*scale))+offsety;
 
-        if ((rx > 0-(tilewidth*scale) && rx <= 640+(tilewidth*scale)) && (ry > 0-(tileheight*scale) && ry <= 480+(tileheight*scale))) {
+        if ((rx > 0-((tilewidth*2)*scale) && rx <= 640+((tilewidth*2)*scale)) && (ry > 0-((tileheight*2)*scale) && ry <= 480+((tileheight*2)*scale))) {
             tilemanager.renderTile(tilesheet, data[i]-1, rx, ry, scale, this.getContext());
         }
 
@@ -353,6 +353,7 @@ NT_MapHandler.prototype.setDebug = function(b, callback) {
 /* ---- PLAYER OBJECT ---- */
 function NT_PlayerObject() {
     this.debug = false;
+    this.coords = { x: 0, y: 0 };
 }
 NT_PlayerObject.prototype.setDebug = function(b, callback) {
     this.debug = b;

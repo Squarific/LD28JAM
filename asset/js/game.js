@@ -22,7 +22,7 @@ window.addEventListener('load', function() {
     tilesheet.setDebug(true);
     map.setDebug(true);
 
-    map.loadMap('map1', 'asset/map/map2.json');
+    map.loadMap('map1', 'asset/map/map3.json');
 
     screen.disableSmoothing();
 
