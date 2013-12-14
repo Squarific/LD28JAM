@@ -11,7 +11,7 @@ window.addEventListener('load', function() {
     image     = new NT_ImageHandler();
     tilesheet = new NT_TilesheetHandler();
     map       = new NT_MapHandler();
-    player    = new NT_PlayerObject(PLAYERWIDTH, PLAYERHEIGHT, PLAYERSPRITEIMAGE);
+
 
     // Debugger
     screen.setDebug(true);
@@ -27,15 +27,19 @@ window.addEventListener('load', function() {
     screen.disableSmoothing();
 	
 	// Follow the player
-	player.addEventListener("move", function (player) {
-		offset.x = player.coords.x - screen.width / 2;
-		offset.y = player.coords.y - screen.height / 2;
-	});
+
 
     // Render Screen
     screen.render();
 
     image.loadImage('terrain', 'asset/img/terrain.png', function() {
+        player    = new NT_PlayerObject(12, 12, image.getImage('terrain'));
+
+        player.addEventListener("move", function (player) {
+            offset.x = player.coords.x - screen.width / 2;
+            offset.y = player.coords.y - screen.height / 2;
+        });
+
         tilesheet.newSheet('terrain', image.getImage('terrain'), 16, 16, function() {
 			requestAnimationFrame(loop);
         });
@@ -46,14 +50,14 @@ window.addEventListener('load', function() {
 function loop () {
 	tickLoop();
 	renderLoop();
-	requestAnimationFrame(renderLoop);
+	requestAnimationFrame(loop);
 }
 
 function renderLoop() {
     screen.render();
     screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y);
     screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y);
-	//screen.renderPlayer(player, PLAYERSPRITEIMAGE, offset.x, offset.y);
+	screen.renderPlayer(player, tilesheet, 'terrain', 0, player.coords.x, player.coords.y);
 
     var c = screen.getContext();
     c.fillStyle = '#FFFFFF';

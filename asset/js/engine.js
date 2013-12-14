@@ -79,11 +79,12 @@ NT_Screen.prototype.enableSmoothing = function() {
         this.context.mozImageSmoothingEnabled = true;
     }
 };
-NT_Screen.prototype.renderPlayer = function (player, spritesheet, offsetx, offsety) {
+NT_Screen.prototype.renderPlayer = function (player, tilehandler, tilesheet, id, offsetx, offsety) {
 	var drawX = player.coords.x - offsetx,
 		drawY = player.coords.y - offsety;
-	player.updateSpriteY();
-	this.getContext().drawImage(spritesheet, player.sprite.x, player.sprite.y, player.width, player.height, drawX, drawY, player.width, player.height);
+	player.updateSpriteY(Date.now());
+    tilehandler.renderTile(tilesheet, id, player.coords.x, player.coords.y, 2, this.getContext());
+//	this.getContext().drawImage(spritesheet, player.sprite.x, player.sprite.y, player.width, player.height, drawX, drawY, player.width, player.height);
 };
 NT_Screen.prototype.renderMap = function(ntmap, layer, tilemanager, tilesheet, scale, offsetx, offsety) {
     var width = ntmap.layers[layer].width;
@@ -365,7 +366,7 @@ function NT_PlayerObject(width, height, spriteImage) {
 	this.lastUpdate = Date.now();
 	this.width = width;
 	this.height = height;
-	this.movespeed = 5;
+	this.movespeed = 0.1;
 	this.sprite = {x: 0, y: 0};
 	this.spriteYFrames = Math.floor(spriteImage.width / this.width);
 	this.spriteFrameSpeed = 1000 / this.spriteYFrames;
