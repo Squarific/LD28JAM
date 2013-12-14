@@ -7,7 +7,7 @@ window.addEventListener('load', function() {
     screen    = new NT_Screen('view', 800, 600, '#888888', '#FFFFFF');
     sound     = new NT_SoundHandler();
     keyboard  = new NT_KeyboardHandler();
-    mouse     = new NT_MouseListener('view');
+    mouse     = new NT_MouseHandler('view');
     image     = new NT_ImageHandler();
     tilesheet = new NT_TilesheetHandler();
 

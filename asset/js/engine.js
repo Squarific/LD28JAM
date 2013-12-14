@@ -88,7 +88,7 @@ NT_KeyboardHandler.prototype.setDebug = function(b, callback) {
 };
 
 /* ---- MOUSE LISTENER ---- */
-function NT_MouseListener(relativeID) {
+function NT_MouseHandler(relativeID) {
     this.debug = false;
     this.coord = { x: 0, y: 0 };
     this.relID = (relativeID!==undefined)? relativeID:null;
@@ -110,10 +110,17 @@ function NT_MouseListener(relativeID) {
         }
     });
 }
-NT_MouseListener.prototype.setDebug = function(b, callback) {
+NT_MouseHandler.prototype.setDebug = function(b, callback) {
     this.debug = b;
     if (callback) { callback(); }
 };
+NT_MouseHandler.prototype.getCoords = function(callback) {
+    if (callback) {
+        callback(this.coord);
+    } else {
+        return this.coord;
+    }
+}
 
 /* ---- IMAGE HANDLER ---- */
 function NT_ImageHandler() {
