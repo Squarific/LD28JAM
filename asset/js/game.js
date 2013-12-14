@@ -1,6 +1,6 @@
 
 
-var screen, sound, keyboard, mouse, image, tilesheet, map, offset={x:0,y:0};
+var screen, sound, keyboard, mouse, image, tilesheet, map, offset={x:0,y:0}, player;
 window.addEventListener('load', function() {
 
     // Create instances
@@ -11,9 +11,10 @@ window.addEventListener('load', function() {
     image     = new NT_ImageHandler();
     tilesheet = new NT_TilesheetHandler();
     map       = new NT_MapHandler();
+    player    = new NT_PlayerObject();
 
     // Debugger
-    screen.setDebug(true);
+    screen.setDebug(false);
     keyboard.setDebug(true);
     mouse.setDebug(false);
     sound.setDebug(true);
@@ -30,8 +31,8 @@ window.addEventListener('load', function() {
 
     image.loadImage('terrain', 'asset/img/terrain.png', function() {
         tilesheet.newSheet('terrain', image.getImage('terrain'), 16, 16, function() {
-            setInterval(function() { tickLoop() }, (1000/30));
             setInterval(function() { renderLoop() }, 0);
+            setInterval(function() { tickLoop() }, (1000/30));
         });
     });
 
@@ -39,8 +40,8 @@ window.addEventListener('load', function() {
 
 function renderLoop() {
     screen.render();
-    screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y)
-    screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y)
+    screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y);
+    screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y);
 }
 
 function tickLoop() {
