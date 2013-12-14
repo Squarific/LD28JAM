@@ -4,7 +4,7 @@ var screen, sound, keyboard, mouse, image, tilesheet, map, offset={x:0,y:0}, pla
 window.addEventListener('load', function() {
 
     // Create instances
-    screen    = new NT_Screen('view', 800, 600, '#888888', '#FFFFFF');
+    screen    = new NT_Screen('view', 800, 600, '#121212', '#FFFFFF');
     sound     = new NT_SoundHandler();
     keyboard  = new NT_KeyboardHandler();
     mouse     = new NT_MouseHandler('view');
@@ -54,6 +54,11 @@ function renderLoop() {
     screen.renderMap(map.getMap('map1'), 0, tilesheet, 'terrain', 6, offset.x, offset.y);
     screen.renderMap(map.getMap('map1'), 1, tilesheet, 'terrain', 6, offset.x, offset.y);
 	//screen.renderPlayer(player, PLAYERSPRITEIMAGE, offset.x, offset.y);
+
+    var c = screen.getContext();
+    c.fillStyle = '#FFFFFF';
+    c.font = 'normal 18px Courier New';
+    c.fillText('Alfalfa Version 1', 10, 22);
 }
 
 function tickLoop() {
