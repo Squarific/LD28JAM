@@ -267,6 +267,7 @@ NT_TilesheetHandler.prototype.tilePosition = function(id, tilew, tileh, imagew, 
 
     if (callback) {
         callback(pos);
+        return pos;
     } else {
         return pos;
     }

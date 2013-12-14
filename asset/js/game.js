@@ -14,7 +14,7 @@ window.addEventListener('load', function() {
     player    = new NT_PlayerObject();
 
     // Debugger
-    screen.setDebug(false);
+    screen.setDebug(true);
     keyboard.setDebug(true);
     mouse.setDebug(false);
     sound.setDebug(true);
